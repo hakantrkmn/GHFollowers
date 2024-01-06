@@ -8,10 +8,11 @@
 import UIKit
 import SnapKit
 
-protocol UserInfoVCDelegate  : AnyObject {
-    func didTapGithubProfile(for user : User)
-    func didTapGetFollowers(for user : User)
+protocol UserInfoVCDelegate : AnyObject
+{
+    func didRequestFollower(for username : String)
 }
+
 
 class UserInfoVC: UIViewController {
     
@@ -21,7 +22,7 @@ class UserInfoVC: UIViewController {
     let dateLabel = GFBodyLabel(textAlignment: .center)
     var itemViews = [UIView]()
     var username : String!
-    weak var delegate : FollowerListVCDelegate!
+    weak var delegate : UserInfoVCDelegate!
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViewController()
@@ -56,7 +57,7 @@ class UserInfoVC: UIViewController {
         self.add(childVC: GFUserInfoHeaderVC(user: user), to: self.headerView)
         self.add(childVC: repoItemVC, to: self.itemViewOne)
         self.add(childVC: followerItemVC, to: self.itemViewTwo)
-        self.dateLabel.text = "GitHub since " +  user.createdAt.convertToDisplayFormat()
+        self.dateLabel.text = "GitHub since " +  user.createdAt.convertMonthYearFormat()
     }
     
     func layoutUI()
@@ -119,7 +120,7 @@ class UserInfoVC: UIViewController {
 }
 
 
-extension UserInfoVC : UserInfoVCDelegate
+extension UserInfoVC : ItemInfoVCDelegate
 {
     func didTapGithubProfile(for user: User) {
         guard let url = URL(string: user.htmlUrl) else {

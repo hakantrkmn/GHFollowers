@@ -81,8 +81,6 @@ enum PersistenceManager
             return .unableToFavorite
         }
         
-        
-        return nil
-    }
+            }
     
 }

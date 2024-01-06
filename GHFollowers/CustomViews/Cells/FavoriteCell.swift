@@ -9,19 +9,19 @@ import UIKit
 import SnapKit
 
 class FavoriteCell: UITableViewCell {
-
+    
     static let reuseID = "FavoriteCell"
     
     let avatarImageView = GFAvatarImageView(frame: .zero )
     let usernameLabel = GFTitleLabel(textAlignment: .left, fontSize: 26)
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) 
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?)
     {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         configure()
     }
     
-    required init?(coder: NSCoder) 
+    required init?(coder: NSCoder)
     {
         fatalError("init(coder:) has not been implemented")
     }
@@ -29,8 +29,14 @@ class FavoriteCell: UITableViewCell {
     func set(favorite : Follower)
     {
         usernameLabel.text = favorite.login
-        avatarImageView.downloadImage(from: favorite.avatarUrl)
-    }
+        NetworkManager.shared.downloadImage(from: favorite.avatarUrl) { image in
+            if image != nil
+            {
+                DispatchQueue.main.async{
+                    self.avatarImageView.image = image
+                }
+            }
+        }    }
     
     
     func configure()
@@ -53,7 +59,7 @@ class FavoriteCell: UITableViewCell {
             make.leading.equalTo(avatarImageView.snp.trailing).offset(24)
             make.trailing.equalTo(self).offset(-padding)
             make.height.equalTo(40)
-
+            
         }
     }
 }

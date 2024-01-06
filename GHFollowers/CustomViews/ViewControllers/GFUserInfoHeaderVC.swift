@@ -40,14 +40,21 @@ class GFUserInfoHeaderVC: UIViewController {
     
     func configureUIElements()
     {
-        avatarImageView.downloadImage(from: user.avatarUrl)
+        NetworkManager.shared.downloadImage(from: user.avatarUrl) { image in
+            if image != nil
+            {
+                DispatchQueue.main.async{
+                    self.avatarImageView.image = image
+                }
+            }
+        }
         usernameLabel.text = user.login
         nameLabel.text = user.name ?? ""
         locationLabel.text = user.location ?? ""
         bioLabel.text = user.bio ?? ""
         bioLabel.numberOfLines = 3
         
-        locationImageView.image = UIImage(systemName: SFSymbols.location)
+        locationImageView.image = SFSymbols.location
         locationImageView.tintColor = .secondaryLabel
     }
     
@@ -101,7 +108,7 @@ class GFUserInfoHeaderVC: UIViewController {
             make.top.equalTo(avatarImageView.snp.bottom).offset(textImagePadding)
             make.leading.equalTo(avatarImageView.snp.leading)
             make.trailing.equalTo(view.snp.trailing).offset(-padding)
-            make.height.equalTo(60)
+            make.height.equalTo(90)
 
         }
     }

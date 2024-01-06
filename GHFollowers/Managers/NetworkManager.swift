@@ -20,7 +20,7 @@ class NetworkManager
     {
         let endpoint = baseUrl + username + "/followers?per_page=100&page=\(page)"
         
-        guard let url = URL(string: endpoint) else 
+        guard let url = URL(string: endpoint) else
         {
             completed(.failure(.invalidUsername))
             return
@@ -55,7 +55,7 @@ class NetworkManager
             catch
             {
                 completed(.failure(.invalidData))
-
+                
             }
         }
         
@@ -97,17 +97,45 @@ class NetworkManager
             {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
+                decoder.dateDecodingStrategy  = .iso8601
                 let user = try decoder.decode(User.self, from: data)
                 completed(.success(user))
             }
             catch
             {
                 completed(.failure(.invalidData))
-
+                
             }
         }
         
         
         task.resume()
+    }
+    
+    func downloadImage(from urlString: String, completed: @escaping (UIImage?)-> Void )
+    {
+        if let image = cache.object(forKey: NSString(string: urlString))
+        {
+            completed(image)
+            return
+        }
+        else
+        {
+            guard let url = URL(string: urlString) else {completed(nil)
+                return}
+            let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+                guard let self = self,
+                      error == nil,
+                      let response = response as? HTTPURLResponse, response.statusCode == 200,
+                      let data = data,
+                      let image = UIImage(data: data)else {completed(nil)
+                    return}
+                
+                self.cache.setObject(image, forKey: NSString(string: urlString))
+                completed(image)
+            }
+            
+            task.resume()
+        }
     }
 }
